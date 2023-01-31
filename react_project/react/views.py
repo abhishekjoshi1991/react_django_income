@@ -36,6 +36,7 @@ class RegisterView(APIView):
             res['status'] = 'failed'
             res['status_code'] = 400
             res['message'].append({'password' : 'Password did not match'})
+            return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user_obj = serializer.save()
