@@ -23,4 +23,6 @@ urlpatterns = [
     path('expense_category/', views.ExpenseCategoryView.as_view()),
     path('register/', views.RegisterView.as_view()),
     path('login/', views.LoginView.as_view()),
+    path('expense/', views.ExpenseAdd.as_view()),
+    path('income/', views.IncomeAdd.as_view()),
 ]

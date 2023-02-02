@@ -2,7 +2,8 @@ from django.shortcuts import render
 import json
 from rest_framework.views import APIView
 from .models import Income, IncomeCategory, ExpenseCategory, Expense
-from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, UserSerializer
+from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, UserSerializer, \
+    ExpenseSerializer, IncomeSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -11,14 +12,9 @@ from django.contrib.auth.models import User
 # Create your views here.
 class IncomeCategoryView(APIView):
     def get(self, request, pk=None):
-        output = {}
         income_category = IncomeCategory.objects.all()
         serializer = IncomeCategorySerializer(income_category, many=True)
-        # res = JsonResponse(serializer.data, safe=False)
-        # output['data'] = json.loads(res.content)
-        # headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
         return Response(serializer.data)
-        # return Response(serializer.data)
 
 
 class ExpenseCategoryView(APIView):
@@ -26,6 +22,7 @@ class ExpenseCategoryView(APIView):
         expense_category = ExpenseCategory.objects.all()
         serializer = ExpenseCategorySerializer(expense_category, many=True)
         return Response(serializer.data)
+
 
 class RegisterView(APIView):
     def post(self, request, pk=None):
@@ -84,4 +81,38 @@ class LoginView(APIView):
             res['status_code'] = 400
             res['message'] = 'User does not exists!'
             return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ExpenseAdd(APIView):
+    def post(self, request):
+        res = {}
+        serializer = ExpenseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            res['status'] = 'success'
+            res['status_code'] = 200
+            res['message'] = 'Entry added successfully!'
+            return Response({'data': res}, status=status.HTTP_200_OK)
+        res['status'] = 'failed'
+        res['status_code'] = 400
+        res['message'] = serializer.errors
+        return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IncomeAdd(APIView):
+    def post(self, request):
+        res = {}
+        serializer = IncomeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            res['status'] = 'success'
+            res['status_code'] = 200
+            res['message'] = 'Entry added successfully!'
+            return Response({'data': res}, status=status.HTTP_200_OK)
+        res['status'] = 'failed'
+        res['status_code'] = 400
+        res['message'] = serializer.errors
+        return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+
 

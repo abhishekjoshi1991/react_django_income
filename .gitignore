@@ -1,0 +1,2 @@
+*.pyc
+/react_project/db.sqlite3

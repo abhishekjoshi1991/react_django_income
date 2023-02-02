@@ -18,7 +18,7 @@ class ExpenseCategory(models.Model):
 
 class Income(models.Model):
     amount = models.FloatField()
-    description = models.TextField()
+    description = models.TextField(blank=True)
     transaction_date = models.DateField()
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     income_categ_id = models.ForeignKey('IncomeCategory', on_delete=models.CASCADE)
