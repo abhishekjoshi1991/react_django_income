@@ -137,7 +137,7 @@ class IncomeAdd(APIView):
 
 
 class UserInfo(APIView):
-    def get(self, request):
+    def post(self, request):
         access_token = request.data.get('access_token')
         if access_token:
             user = User.objects.filter(auth_token=access_token).first()
