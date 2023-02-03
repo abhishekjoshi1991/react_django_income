@@ -39,6 +39,7 @@ class ExpenseCategoryView(APIView):
         serializer = ExpenseCategorySerializer(expense_category, many=True)
         return Response(serializer.data)
 
+
 # View get called while registering new user
 class RegisterView(APIView):
     def post(self, request, pk=None):
@@ -63,6 +64,7 @@ class RegisterView(APIView):
         for error, description in serializer.errors.items():
             res['message'].append({error: description[0].title()})
         return Response(res, status=status.HTTP_400_BAD_REQUEST)
+
 
 # View get called when logging in
 class LoginView(APIView):
@@ -134,4 +136,17 @@ class IncomeAdd(APIView):
         return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserInfo(APIView):
+    def get(self, request):
+        access_token = request.data.get('access_token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                res = StatusMessage.get_status('success')
+                res['user_id'] = user.id
+                res['username'] = user.username
+                return Response({'data': res}, status=status.HTTP_200_OK)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
