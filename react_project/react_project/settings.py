@@ -130,6 +130,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = False # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 # CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_HEADERS = (
+    'Access-Token',
+    # 'accept-encoding',
+    # 'authorization',
+    # 'content-type',
+    # 'dnt',
+    # 'origin',
+    # 'user-agent',
+    # 'x-csrftoken',
+    # 'x-requested-with',
+)
+
 CORS_ORIGIN_WHITELIST = (
        'http://localhost:3000', 'http://65.0.132.5:8000',
 )
