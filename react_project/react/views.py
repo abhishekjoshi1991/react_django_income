@@ -1,5 +1,3 @@
-from django.shortcuts import render
-import json
 from rest_framework.views import APIView
 from .models import Income, IncomeCategory, ExpenseCategory, Expense
 from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, UserSerializer, \
@@ -7,7 +5,6 @@ from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, Us
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
-
 
 # Create your views here.
 class StatusMessage:
@@ -137,14 +134,45 @@ class IncomeAdd(APIView):
 
 
 class UserInfo(APIView):
-    def post(self, request):
-        access_token = request.data.get('access_token')
+    def get(self, request):
+        access_token = request.headers.get('Access-Token')
         if access_token:
             user = User.objects.filter(auth_token=access_token).first()
             if user:
                 res = StatusMessage.get_status('success')
-                res['user_id'] = user.id
-                res['username'] = user.username
+                res['user_data'] = []
+                res['user_data'].append({'user_id': user.id, 'username': user.username})
+
+                # get all income of user
+                all_income = Income.objects.filter(user_id=user.id).order_by('-transaction_date')
+                if all_income:
+                    res['income'] = []
+                    for income in all_income:
+                        income_dict = dict()
+                        income_dict['id'] = income.id
+                        income_dict['amount'] = income.amount
+                        income_dict['description'] = income.description
+                        income_dict['transaction_date'] = income.transaction_date.strftime("%b %d, %Y")
+                        income_dict['income_categ_id'] = income.income_categ_id.name
+                        res['income'].append(income_dict)
+                else:
+                    res['income'] = []
+
+                # get all expense of user
+                all_expense = Expense.objects.filter(user_id=user.id).order_by('-transaction_date')
+                if all_expense:
+                    res['expense'] = []
+                    for expense in all_expense:
+                        expense_dict = dict()
+                        expense_dict['id'] = expense.id
+                        expense_dict['amount'] = expense.amount
+                        expense_dict['description'] = expense.description
+                        expense_dict['transaction_date'] = expense.transaction_date.strftime("%b %d, %Y")
+                        expense_dict['expense_categ_id'] = expense.expense_categ_id.name
+                        res['expense'].append(expense_dict)
+                else:
+                    res['expense'] = []
+
                 return Response({'data': res}, status=status.HTTP_200_OK)
             else:
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
