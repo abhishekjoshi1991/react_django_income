@@ -190,7 +190,7 @@ class IncomeExpenseChart(APIView):
             if user:
                 current_month = request.data.get('month') or datetime.today().month
                 current_month_name = calendar.month_name[current_month]
-                current_month_income = Income.objects.filter(user_id=21).filter(transaction_date__month=current_month)
+                current_month_income = Income.objects.filter(user_id=user.id).filter(transaction_date__month=current_month)
                 income_from_salary = 0
                 income_from_other = 0
                 for income in current_month_income:
