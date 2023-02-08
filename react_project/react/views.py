@@ -194,7 +194,7 @@ class IncomeExpenseChart(APIView):
                 income_from_salary = 0
                 income_from_other = 0
                 for income in current_month_income:
-                    if income.income_categ_id.name == 'Income':
+                    if income.income_categ_id.name == 'Salary':
                         income_from_salary += income.amount
                     else:
                         income_from_other += income.amount
