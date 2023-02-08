@@ -5,6 +5,8 @@ from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, Us
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
+from datetime import datetime
+import calendar
 
 # Create your views here.
 class StatusMessage:
@@ -173,6 +175,45 @@ class UserInfo(APIView):
                 else:
                     res['expense'] = []
 
+                return Response({'data': res}, status=status.HTTP_200_OK)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IncomeExpenseChart(APIView):
+    def get(self, request):
+        # import pdb; pdb.set_trace()
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                current_month = request.data.get('month') or datetime.today().month
+                current_month_name = calendar.month_name[current_month]
+                current_month_income = Income.objects.filter(user_id=21).filter(transaction_date__month=current_month)
+                income_from_salary = 0
+                income_from_other = 0
+                for income in current_month_income:
+                    if income.income_categ_id.name == 'Income':
+                        income_from_salary += income.amount
+                    else:
+                        income_from_other += income.amount
+                res = StatusMessage.get_status('success')
+                res['income'] = []
+                total_income_dict = {
+                    "id": 1,
+                    "month": current_month_name,
+                    "income_category": "Salary",
+                    "amount": income_from_salary
+                }
+                total_other_income_dict = {
+                    "id": 2,
+                    "month": current_month_name,
+                    "income_category": "Other",
+                    "amount": income_from_other
+                }
+                res['income'].append(total_income_dict)
+                res['income'].append(total_other_income_dict)
                 return Response({'data': res}, status=status.HTTP_200_OK)
             else:
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')

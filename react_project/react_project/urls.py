@@ -26,4 +26,5 @@ urlpatterns = [
     path('expense/', views.ExpenseAdd.as_view()),
     path('income/', views.IncomeAdd.as_view()),
     path('userinfo/', views.UserInfo.as_view()),
+    path('income_chart/', views.IncomeExpenseChart.as_view()),
 ]
