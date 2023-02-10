@@ -30,7 +30,7 @@ class IncomeCategoryView(APIView):
         income_category = IncomeCategory.objects.all()
         serializer = IncomeCategorySerializer(income_category, many=True)
         headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
-        return Response(serializer.data, headers=headers)
+        return Response(serializer.data, headers=headers, content_type='application/json')
 
 
 class ExpenseCategoryView(APIView):
@@ -38,7 +38,7 @@ class ExpenseCategoryView(APIView):
         expense_category = ExpenseCategory.objects.all()
         serializer = ExpenseCategorySerializer(expense_category, many=True)
         headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
-        return Response(serializer.data, headers=headers)
+        return Response(serializer.data, headers=headers, content_type='application/json')
 
 
 # View get called while registering new user
