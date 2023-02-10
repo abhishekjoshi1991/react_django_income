@@ -137,8 +137,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 CORS_ORIGIN_WHITELIST = (
-       'http://localhost:3000', 'http://65.0.132.5:8000',
+       'http://localhost:3000', 'http://65.0.132.5:8000', 'http://3.110.83.127/',
 )
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000', 'http://65.0.132.5:8000',
+    'http://localhost:3000', 'http://65.0.132.5:8000', 'http://3.110.83.127/',
 ]
