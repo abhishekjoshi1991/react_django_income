@@ -134,6 +134,7 @@ CORS_ORIGIN_ALLOW_ALL = False # If this is used then `CORS_ORIGIN_WHITELIST` wil
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "Access-Token",
+    "Access-Control-Allow-Origin",
 ]
 
 CORS_ORIGIN_WHITELIST = (
