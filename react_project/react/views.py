@@ -29,14 +29,16 @@ class IncomeCategoryView(APIView):
     def get(self, request, pk=None):
         income_category = IncomeCategory.objects.all()
         serializer = IncomeCategorySerializer(income_category, many=True)
-        return Response(serializer.data)
+        headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
+        return Response(serializer.data, headers=headers)
 
 
 class ExpenseCategoryView(APIView):
     def get(self, request, pk=None):
         expense_category = ExpenseCategory.objects.all()
         serializer = ExpenseCategorySerializer(expense_category, many=True)
-        return Response(serializer.data)
+        headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
+        return Response(serializer.data, headers=headers)
 
 
 # View get called while registering new user
