@@ -1,12 +1,13 @@
+import calendar
+from datetime import datetime
+from django.db.models import Sum
+from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Income, IncomeCategory, ExpenseCategory, Expense
 from .serializers import IncomeCategorySerializer, ExpenseCategorySerializer, UserSerializer, \
     ExpenseSerializer, IncomeSerializer
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth.models import User
-from datetime import datetime
-import calendar
 
 # Create your views here.
 class StatusMessage:
@@ -29,16 +30,16 @@ class IncomeCategoryView(APIView):
     def get(self, request, pk=None):
         income_category = IncomeCategory.objects.all()
         serializer = IncomeCategorySerializer(income_category, many=True)
-        headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
-        return Response(serializer.data, headers=headers, content_type='application/json')
+        # headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
+        return Response(serializer.data)
 
 
 class ExpenseCategoryView(APIView):
     def get(self, request, pk=None):
         expense_category = ExpenseCategory.objects.all()
         serializer = ExpenseCategorySerializer(expense_category, many=True)
-        headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
-        return Response(serializer.data, headers=headers, content_type='application/json')
+        # headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
+        return Response(serializer.data)
 
 
 # View get called while registering new user
@@ -192,29 +193,26 @@ class IncomeExpenseChart(APIView):
                 current_month = request.data.get('month') or datetime.today().month
                 current_month_name = calendar.month_name[current_month]
                 current_month_income = Income.objects.filter(user_id=user.id).filter(transaction_date__month=current_month)
-                income_from_salary = 0
-                income_from_other = 0
-                for income in current_month_income:
-                    if income.income_categ_id.name == 'Salary':
-                        income_from_salary += income.amount
-                    else:
-                        income_from_other += income.amount
+                current_month_expense = Expense.objects.filter(user_id=user.id).filter(transaction_date__month=current_month)
+
                 res = StatusMessage.get_status('success')
                 res['income'] = []
-                total_income_dict = {
-                    "id": 1,
-                    "month": current_month_name,
-                    "income_category": "Salary",
-                    "amount": income_from_salary
-                }
-                total_other_income_dict = {
-                    "id": 2,
-                    "month": current_month_name,
-                    "income_category": "Other",
-                    "amount": income_from_other
-                }
-                res['income'].append(total_income_dict)
-                res['income'].append(total_other_income_dict)
+                res['expense'] = []
+                for income in current_month_income.values('income_categ_id').annotate(Sum('amount')):
+                    income_categ_name = IncomeCategory.objects.get(id=income['income_categ_id']).name
+                    individual_income_dict = {'month': current_month_name,
+                                              "income_category": income_categ_name,
+                                              "amount": income['amount__sum']
+                                              }
+                    res['income'].append(individual_income_dict)
+
+                for expense in current_month_expense.values('expense_categ_id').annotate(Sum('amount')):
+                    expense_categ_name = ExpenseCategory.objects.get(id=expense['expense_categ_id']).name
+                    individual_expense_dict = {'month': current_month_name,
+                                              "expense_category": expense_categ_name,
+                                              "amount": expense['amount__sum']
+                                              }
+                    res['expense'].append(individual_expense_dict)
                 return Response({'data': res}, status=status.HTTP_200_OK)
             else:
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
