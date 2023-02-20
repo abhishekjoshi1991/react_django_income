@@ -185,7 +185,7 @@ class UserInfo(APIView):
 
 
 class IncomeExpenseChart(APIView):
-    def get(self, request):
+    def post(self, request):
         access_token = request.headers.get('Access-Token')
         if access_token:
             user = User.objects.filter(auth_token=access_token).first()
