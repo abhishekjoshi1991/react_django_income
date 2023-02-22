@@ -29,9 +29,14 @@ class StatusMessage:
 class IncomeCategoryView(APIView):
     def get(self, request, pk=None):
         income_category = IncomeCategory.objects.all()
-        serializer = IncomeCategorySerializer(income_category, many=True)
-        # headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
-        return Response(serializer.data)
+        response = {'data': []}
+        if income_category:
+            for categ in income_category:
+                vals = {'name': categ.name}
+                response['data'].append(vals)
+        # serializer = IncomeCategorySerializer(income_category, many=True)
+        # # headers = {'Access-Control-Allow-Origin': "*", 'Accept': '*/*'}
+        return Response(response)
 
 
 class ExpenseCategoryView(APIView):
