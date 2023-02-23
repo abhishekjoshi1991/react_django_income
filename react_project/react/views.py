@@ -1,6 +1,8 @@
 import calendar
+import random
 from datetime import datetime
 from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
@@ -216,3 +218,52 @@ class IncomeExpenseChart(APIView):
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
                 return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
+class IncomeExpenseAllYear(APIView):
+    def post(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                current_year = request.data.get('year') or datetime.today().year
+                current_year_income = Income.objects.filter(user_id=user.id).filter(
+                    transaction_date__year=current_year)
+                current_year_expense = Expense.objects.filter(user_id=user.id).filter(
+                    transaction_date__year=current_year)
+
+                month_wise_income = current_year_income.annotate(month=ExtractMonth('transaction_date')).values('month').annotate(total=Sum('amount')).values('month','total')
+                month_wise_expense = current_year_expense.annotate(month=ExtractMonth('transaction_date')).values('month').annotate(total=Sum('amount')).values('month','total')
+
+                months_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                vals_income = ['' for i in range(12)]
+                for record in month_wise_income:
+                    if record['month'] in months_list:
+                        index = months_list.index(record['month'])
+                        vals_income[index] = record['total']
+                color_1 = random.randint(0, 255)
+                color_2 = random.randint(0, 255)
+                color_3 = random.randint(0, 255)
+
+                vals_expense = ['' for j in range(12)]
+                for record_e in month_wise_expense:
+                    if record_e['month'] in months_list:
+                        index_e = months_list.index(record_e['month'])
+                        vals_expense[index_e] = record_e['total']
+                color_e1 = random.randint(0, 255)
+                color_e2 = random.randint(0, 255)
+                color_e3 = random.randint(0, 255)
+
+                dataset = [{
+                    'label': 'Income',
+                    'data': vals_income,
+                    'backgroundColor': 'rgb({}, {}, {})'.format(color_1, color_2, color_3)
+                    },
+                    {
+                        'label': 'Expense',
+                        'data': vals_expense,
+                        'backgroundColor': 'rgb({}, {}, {})'.format(color_e1, color_e2, color_e3)
+                    }
+                ]
+                return Response(dataset, status=status.HTTP_200_OK)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
