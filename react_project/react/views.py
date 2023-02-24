@@ -239,28 +239,22 @@ class IncomeExpenseAllYear(APIView):
                     if record['month'] in months_list:
                         index = months_list.index(record['month'])
                         vals_income[index] = record['total']
-                color_1 = random.randint(0, 255)
-                color_2 = random.randint(0, 255)
-                color_3 = random.randint(0, 255)
 
                 vals_expense = ['' for j in range(12)]
                 for record_e in month_wise_expense:
                     if record_e['month'] in months_list:
                         index_e = months_list.index(record_e['month'])
                         vals_expense[index_e] = record_e['total']
-                color_e1 = random.randint(0, 255)
-                color_e2 = random.randint(0, 255)
-                color_e3 = random.randint(0, 255)
 
                 dataset = [{
                     'label': 'Income',
                     'data': vals_income,
-                    'backgroundColor': 'rgb({}, {}, {})'.format(color_1, color_2, color_3)
+                    'backgroundColor': 'rgb(102, 179, 255)'
                     },
                     {
                         'label': 'Expense',
                         'data': vals_expense,
-                        'backgroundColor': 'rgb({}, {}, {})'.format(color_e1, color_e2, color_e3)
+                        'backgroundColor': 'rgb(255, 166, 77)'
                     }
                 ]
                 return Response(dataset, status=status.HTTP_200_OK)
