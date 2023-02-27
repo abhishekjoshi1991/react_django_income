@@ -275,7 +275,7 @@ class ExpenseDetail(APIView):
                     'id': expense_id,
                     'amount': expense_obj.amount,
                     'description': expense_obj.description,
-                    'transaction_date': expense_obj.transaction_date.strftime("%Y-%B-%d"),
+                    'transaction_date': expense_obj.transaction_date.strftime("%Y-%m-%d"),
                     'expense_categ_id': expense_obj.expense_categ_id.id
                 }
                 res['expense'] = [vals]
