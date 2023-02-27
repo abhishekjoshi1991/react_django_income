@@ -261,3 +261,26 @@ class IncomeExpenseAllYear(APIView):
             else:
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
                 return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+class ExpenseDetail(APIView):
+    def post(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                expense_id = request.data.get('id')
+                expense_obj = Expense.objects.filter(id=expense_id).first()
+                res = StatusMessage.get_status('success')
+                vals = {
+                    'id': expense_id,
+                    'amount': expense_obj.amount,
+                    'description': expense_obj.description,
+                    'transaction_date': expense_obj.transaction_date.strftime("%b %d, %Y"),
+                    'expense_categ_id': expense_obj.expense_categ_id.id
+                }
+                res['expense'] = [vals]
+                return Response({'data': res}, status=status.HTTP_200_OK)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
