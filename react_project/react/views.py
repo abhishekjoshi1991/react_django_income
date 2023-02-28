@@ -114,6 +114,24 @@ class ExpenseAdd(APIView):
             res['message'].append({error: description[0].title()})
         return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                request.data.update({'user_id': user.id})
+                expense_id = request.data.get('id')
+                expense_obj = Expense.objects.get(id=expense_id)
+                serializer = ExpenseSerializer(expense_obj, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    res = StatusMessage.get_status('success', 'Entry Updated Successfully!')
+                    return Response({'data': res})
+                return Response(serializer.errors)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class IncomeAdd(APIView):
     def post(self, request):
@@ -136,6 +154,24 @@ class IncomeAdd(APIView):
         for error, description in serializer.errors.items():
             res['message'].append({error: description[0].title()})
         return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                request.data.update({'user_id': user.id})
+                income_id = request.data.get('id')
+                income_obj = Income.objects.get(id=income_id)
+                serializer = IncomeSerializer(income_obj, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    res = StatusMessage.get_status('success', 'Entry Updated Successfully!')
+                    return Response({'data': res})
+                return Response(serializer.errors)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserInfo(APIView):
@@ -284,3 +320,24 @@ class ExpenseDetail(APIView):
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
                 return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
+class IncomeDetail(APIView):
+    def post(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                income_id = request.data.get('id')
+                income_obj = Income.objects.filter(id=income_id).first()
+                res = StatusMessage.get_status('success')
+                vals = {
+                    'id': income_id,
+                    'amount': income_obj.amount,
+                    'description': income_obj.description,
+                    'transaction_date': income_obj.transaction_date.strftime("%Y-%m-%d"),
+                    'income_categ_id': income_obj.income_categ_id.id
+                }
+                res['income'] = [vals]
+                return Response({'data': res}, status=status.HTTP_200_OK)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)

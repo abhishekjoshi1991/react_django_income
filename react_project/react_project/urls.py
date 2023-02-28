@@ -29,4 +29,5 @@ urlpatterns = [
     path('income_expense_chart/', views.IncomeExpenseChart.as_view()),
     path('income_expense_all_year/', views.IncomeExpenseAllYear.as_view()),
     path('expense_details/', views.ExpenseDetail.as_view()),
+    path('income_details/', views.IncomeDetail.as_view()),
 ]
