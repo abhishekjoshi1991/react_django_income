@@ -312,11 +312,13 @@ class IncomeExpenseAllYear(APIView):
 
                 dataset = [{
                     'label': 'Income',
+                    'year': current_year,
                     'data': vals_income,
                     'backgroundColor': 'rgb(102, 179, 255)'
                     },
                     {
                         'label': 'Expense',
+                        'year': current_year,
                         'data': vals_expense,
                         'backgroundColor': 'rgb(255, 166, 77)'
                     }
