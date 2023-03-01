@@ -132,6 +132,20 @@ class ExpenseAdd(APIView):
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
                 return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                request.data.update({'user_id': user.id})
+                expense_id = request.data.get('id')
+                expense_obj = Expense.objects.get(id=expense_id)
+                expense_obj.delete()
+                res = StatusMessage.get_status('success', 'Entry Deleted Successfully!')
+                return Response({'data': res})
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
 
 class IncomeAdd(APIView):
     def post(self, request):
@@ -169,6 +183,21 @@ class IncomeAdd(APIView):
                     res = StatusMessage.get_status('success', 'Entry Updated Successfully!')
                     return Response({'data': res})
                 return Response(serializer.errors)
+            else:
+                res = StatusMessage.get_status('failed', 'Provide Valid Token!')
+                return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        access_token = request.headers.get('Access-Token')
+        if access_token:
+            user = User.objects.filter(auth_token=access_token).first()
+            if user:
+                request.data.update({'user_id': user.id})
+                income_id = request.data.get('id')
+                income_obj = Income.objects.get(id=income_id)
+                income_obj.delete()
+                res = StatusMessage.get_status('success', 'Entry Deleted Successfully!')
+                return Response({'data': res})
             else:
                 res = StatusMessage.get_status('failed', 'Provide Valid Token!')
                 return Response({'data': res}, status=status.HTTP_400_BAD_REQUEST)
