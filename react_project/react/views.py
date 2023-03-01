@@ -256,7 +256,6 @@ class IncomeExpenseChart(APIView):
             user = User.objects.filter(auth_token=access_token).first()
             if user:
                 current_month = request.data.get('month') or datetime.today().month
-                current_month_name = calendar.month_name[current_month]
                 current_month_income = Income.objects.filter(user_id=user.id).filter(transaction_date__month=current_month)
                 current_month_expense = Expense.objects.filter(user_id=user.id).filter(transaction_date__month=current_month)
 
@@ -265,7 +264,7 @@ class IncomeExpenseChart(APIView):
                 res['expense'] = []
                 for income in current_month_income.values('income_categ_id').annotate(Sum('amount')):
                     income_categ_name = IncomeCategory.objects.get(id=income['income_categ_id']).name
-                    individual_income_dict = {'month': current_month_name,
+                    individual_income_dict = {'month': current_month,
                                               "income_category": income_categ_name,
                                               "amount": income['amount__sum']
                                               }
@@ -273,7 +272,7 @@ class IncomeExpenseChart(APIView):
 
                 for expense in current_month_expense.values('expense_categ_id').annotate(Sum('amount')):
                     expense_categ_name = ExpenseCategory.objects.get(id=expense['expense_categ_id']).name
-                    individual_expense_dict = {'month': current_month_name,
+                    individual_expense_dict = {'month': current_month,
                                               "expense_category": expense_categ_name,
                                               "amount": expense['amount__sum']
                                               }
